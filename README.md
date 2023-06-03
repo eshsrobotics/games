@@ -2,11 +2,19 @@
 A repository for storing games that the El Segundo High School Robotics Club
 programs together.
 
+- [How to set up your computer](#how-to-set-up-your-computer)
+  - [Installation](#installation)
+    - [Windows installation](#windows-installation)
+    - [Windows installation (via Chocolatey)](#windows-installation-via-chocolatey)
+    - [MacOS installation](#macos-installation)
+    - [Installing the Visual Studio Code plugins](#installing-the-Visual-Studio-Code-plugins)
+  - [Cloning the repository](#cloning-the-repository)
+
 ## How to set up your computer
 
 ### Installation
 #### What you need to install
-1. [icon] **Visual Studio Code** — Integrated Development Environment (IDE)
+1. ![icon](docs/vscode.png) **Visual Studio Code** — Integrated Development Environment (IDE)
     - It's not the best text editor in the world (_not even close_), but it
       does have a useful realtime collaboration plugin that allows all of us
       to work on the same code at the same time and see each other's edits.
@@ -47,27 +55,28 @@ programs together.
         ```
 4. Install Git.
 
-The most common Windows build of Git is [Git for
-Windows](https://gitforwindows.org/).  In addition to the `git.exe` terminal
-application itself, it includes:
+   The most common Windows build of Git is [Git for
+   Windows](https://gitforwindows.org/).  In addition to the `git.exe`
+   terminal application itself, it includes:
 
-    - A Git-specific shell called "Git Bash" (which we don't use),
-    - A graphical interface called "Git GUI" (which we don't use), and
-    - A credential manager that allows you to log into GitHub using your web
-      browser whenever you execute `git push` (we do use this.)
+   - A Git-specific shell called "Git Bash" (which we don't use),
+   - A graphical interface called "Git GUI" (which we don't use), and
+   - A credential manager that allows you to log into GitHub using your web
+     browser whenever you execute `git push` (we do use this.)
 
-You can install this program separately, but it's easier to install it by
-installing **[Cmder](https://cmder.app/)**, a multi-tabbed terminal for Windows
-that has Git for Windows built into it.  You'll want the **full** version;
-once it is installed, pin it to your taskbar and use it as your preferred
-terminal.
+   You can install this program separately, but it's easier to install it by
+   installing ![icon](docs/cmder.png) **[Cmder](https://cmder.app/)**, a multi-tabbed terminal for
+   Windows that has Git for Windows built into it.  You'll want the **full**
+   version; once it is installed, pin it to your taskbar and use it as your
+   preferred terminal.
 
 #### Windows installation (via Chocolatey)
-*If you don't the Chocolatey package manager and you have the permission to
-[install](https://chocolatey.org/install) it, we highly recommend that you do;
-it makes installing and upgrading software much, much easier.*
+*Chocolatey is not required for this project.  But for those students who
+don't the Chocolatey package manager and have the permission to
+[install](https://chocolatey.org/install) it, we highly recommend that they
+do.  Chocolatey makes installing and upgrading software much, much easier.*
 
-Once you have Chocolatey, open a terminal as an administrator and run the
+If you have Chocolatey, open a terminal as an administrator and run the
 following commands:
 
 1. To install Visual Studio Code: `choco install vscode`
@@ -75,7 +84,7 @@ following commands:
 2. To install OpenJDK 17: `choco install temurin17`
 3. To install Git for Windows: `choco install git`
 #### MacOS installation
-These instructions rely on the Homebrew package manager.
+These instructions rely on the [Homebrew](https://brew.sh) package manager.
 
 1. Install Visual Studio Code: `brew install visual-studio-code`
     - Please pin it to your Dock to make it easy to open in the future.
@@ -84,11 +93,11 @@ These instructions rely on the Homebrew package manager.
 
 ### Installing the Visual Studio Code plugins
 1. Open VSCode.
-2. Click on the [icon] *Extensions* button on the left sidebar.
+2. Click on the ![icon](docs/extensions.png) *Extensions* button on the left sidebar.
 3. Search for and install the following extensions:
-    1. _Extension Pack for Java_ - allows you to build and debug Java code
-    2. _GitLens_ - shows commit history per-line
-    3. _Live Share_ - allows collaborators to simultaneously edit the same
+    1. ![icon](docs/extension-pack-for-java.png) _Extension Pack for Java_ - allows you to build and debug Java code
+    2. ![icon](docs/gitlens.png) _GitLens_ - shows commit history per-line
+    3. ![icon](docs/live-share.png) _Live Share_ - allows collaborators to simultaneously edit the same
        buffers
     4. _Base16 Rebecca_ - Uche likes purple color themes
 
