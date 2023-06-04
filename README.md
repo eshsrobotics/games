@@ -9,6 +9,7 @@ programs together.
     - [MacOS installation](#macos-installation)
     - [Installing the Visual Studio Code plugins](#installing-the-Visual-Studio-Code-plugins)
   - [Cloning the repository](#cloning-the-repository)
+- [libGDX Cheatsheet](#libgdx-cheatsheet)
 
 ## How to set up your computer
 
@@ -95,11 +96,14 @@ These instructions rely on the [Homebrew](https://brew.sh) package manager.
 1. Open VSCode.
 2. Click on the ![icon](docs/extensions.png) *Extensions* button on the left sidebar.
 3. Search for and install the following extensions:
-    1. ![icon](docs/extension-pack-for-java.png) _Extension Pack for Java_ - allows you to build and debug Java code
+    1. ![icon](docs/extension-pack-for-java.png) _Extension Pack for Java_ -
+       allows you to build and debug Java code
     2. ![icon](docs/gitlens.png) _GitLens_ - shows commit history per-line
-    3. ![icon](docs/live-share.png) _Live Share_ - allows collaborators to simultaneously edit the same
-       buffers
-    4. _Base16 Rebecca_ - Uche likes purple color themes
+    3. ![icon](docs/live-share.png) _Live Share_ - allows collaborators to
+       simultaneously edit the same buffers
+    4. ![icon](docs/rewrap.png) _Rewrap_ - Allows you to word-wrap long lines
+       using `Alt + Q` (`⌥Option + Q` on MacOS)
+    5. _Base16 Rebecca_ - Uche likes purple color themes
 
 ### Cloning the repository
 1. Create an account on GitHub if you haven't yet.
@@ -139,3 +143,27 @@ These instructions rely on the [Homebrew](https://brew.sh) package manager.
     git clone https://github.com/eshsrobotics/games
     ```
 5. Finally, open the `games` folder from within Visual Studio Code.  You're done!
+
+## libGDX Cheatsheet
+
+The java games in this repository use [libGDX](https://libgdx.com), a Java game
+library that combines several popular game-related frameworks.  It uses Gradle
+for building and running, so there are a number of important Gradle targets:
+
+1. Compiling and testing:
+    - `./gradlew build`: Builds the application for all output environments.
+1. Running:
+    - `./gradlew desktop:run`: Runs the **desktop** version of the application
+    - `./gradlew html:superDev`: Runs the web application in _Super Dev mode_,
+      which allows browser debugging and on-the-fly recompilation.
+
+      Visit **http://localhost:8080/index.html** to play your game.
+    - `./gradlew ios:launchIPhoneSimulator`: Runs the **iPhone** version of the
+      app.  This requires XCode, and so it will only succeed on Macs.
+    - `./gradlew android:installDebug android:run`: Runs the **Android** version
+      of the app.  This requires an installed Android SDK on your system; once
+      you install it, you will need to set the `ANDROID_HOME` environment
+      variable to point to that folder.
+
+You can add `--debug` at the end of any of these Gradle targets to get more
+information if something does wrong.
