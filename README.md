@@ -165,5 +165,10 @@ for building and running, so there are a number of important Gradle targets:
       you install it, you will need to set the `ANDROID_HOME` environment
       variable to point to that folder.
 
-You can add `--debug` at the end of any of these Gradle targets to get more
-information if something does wrong.
+    You can add `--debug` at the end of any of these Gradle targets to get
+    more information if something does wrong.
+1. Documentation:
+    - [Official Javadoc](https://javadoc.io/doc/com.badlogicgames.gdx)
+    - [Official wiki](https://libgdx.com/wiki/)
+    - [Awesome-LibGDX](https://github.com/rafaskb/awesome-libgdx#readme): A
+      collection of links to tools and resources that work well with LibGDX
