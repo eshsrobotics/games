@@ -28,8 +28,14 @@ programs together.
       version of Git.
 
 #### Windows installation
-1. If you have installed the Chocolatey package manager, you can skip to the
-   next section.  Otherwise:
+1. Do you have the Chocolatey package manager installed?
+
+    ```sh
+    choco
+    ```
+
+   If the command succeeded, you can skip to the [next
+   section](#windows-installation-via-chocolatey).  Otherwise:
 2. [Download VSCode](https://code.visualstudio.com) and install it.  Please
    pin it to your taskbar so it is easy to find.
     - FRC students who set up their computers as driver stations will already
