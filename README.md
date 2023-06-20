@@ -152,6 +152,52 @@ for building and running, so there are a number of important Gradle targets:
 
 1. Compiling and testing:
     - `./gradlew build`: Builds the application for all output environments.
+        - If you see a project build fail with the following error:
+                <pre>
+                  Error: Could not find or load main class org.gradle.wrapper.GradleWrapperMain
+                  Caused by: java.lang.ClassNotFoundException: org.gradle.wrapper.GradleWrapperMain
+                </pre>
+          Then you are the victim of **bad defaults** and a **bad error
+          message**.  A more sensible error message would have said:
+                <pre>
+                  Error: could not find gradle-wrapper.jar
+                  Did you accidentally add it to your .gitignore?
+                </pre>
+
+            - As it turns out, the `gdx-setup.jar` [project generation
+              wizard](https://libgdx.com/wiki/start/project-generation) creates
+              [broken
+              projects](https://support.snyk.io/hc/en-us/articles/360007745957-Snyk-test-Could-not-find-or-load-main-class-org-gradle-wrapper-GradleWrapperMain)
+              out of the box, since its `.gitignore` file excludes the directory
+              that it puts `gradle-wrapper.jar` in.  Without this JAR file,
+              `./gradlew` cannot operate.
+
+              The person who _runs_ the wizard will have a local copy of
+              `gradle-wrapper.jar`, but since it is automatically gitignored,
+              it will not be pushed upstream when they push the rest of their
+              code.  Everyone who pulls it will see the error message shown
+              above!
+
+            - To fix the problem, do the following:
+
+                1. Change `.gitignore` to add an exception for
+                   `gradle-wrapper.jar`.
+
+                   ``` diff
+
+                   @@ -93,6 +93,7 @@ nb-configuration.xml
+
+                    /local.properties
+                    .gradle/
+                   +!gradle/wrapper/gradle-wrapper.jar
+                    gradle-app.setting
+                    /build/
+                    /android/build/
+
+                   ```
+                1. `git add ./gradle/wrapper/gradle-wrapper.jar` so that other
+                   people can see it.
+
 1. Running:
     - `./gradlew desktop:run`: Runs the **desktop** version of the application
     - `./gradlew html:superDev`: Runs the web application in _Super Dev mode_,
