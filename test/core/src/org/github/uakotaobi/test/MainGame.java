@@ -87,8 +87,12 @@ public class MainGame extends ApplicationAdapter {
 		pixmap.fill();
 
 		final Random generator = new Random();
-		final Color start = new Color(0.2f, 0f, 0.2f, 1f),
-				end = new Color(1.0f, 1.0f, 1.0f, 1f);
+		final float min_hue = 45.0f,
+			    max_hue = 170.0f,
+			    min_saturation = 0.9f,
+			    max_saturation = 1.0f,
+			    min_value = 0.0f,
+			    max_value = 1.0f;
 
 		final int WORLD_WIDTH = (int) 1e08;
 		for (int y = 0; y < height; ++y) {
@@ -108,8 +112,14 @@ public class MainGame extends ApplicationAdapter {
 				if (generator.nextDouble() < density) {
 					// We will generate some sort of star
 					// here.
-					float u = generator.nextFloat();
-					Color starColor = start.lerp(end, u * u);
+					float u_h = generator.nextFloat(),
+					      u_s = generator.nextFloat(),
+					      u_v = generator.nextFloat();
+					float h = min_hue + u_h * (max_hue - min_hue),
+					      s = min_saturation + u_s * (max_saturation - min_saturation),
+					      v = min_value + u_v * (max_value - min_value);
+
+					Color starColor = new Color().fromHsv(h, s, v);
 					pixmap.setColor(starColor);
 					pixmap.drawRectangle(x, y, 1, 1);
 				}
