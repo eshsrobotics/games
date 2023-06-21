@@ -186,8 +186,8 @@ for building and running, so there are a number of important Gradle targets:
 
             - To fix the problem, do the following:
 
-                1. Change `.gitignore` to add an exception for
-                   `gradle-wrapper.jar`.
+                1. Change the `gdx-setup.jar`-generated `.gitignore` file to
+                   add an exception for `gradle-wrapper.jar`.
 
                    ``` diff
 
