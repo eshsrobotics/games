@@ -1,4 +1,3 @@
-
 buildscript {
   repositories {
     mavenCentral()
@@ -129,7 +128,7 @@ task dist(dependsOn: [clean, compileGwt]) {
 task addSource {
   doLast {
     sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
-    
+
   }
 }
 
@@ -145,7 +144,7 @@ tasks.compileGwt.dependsOn(addSource)
 tasks.draftCompileGwt.dependsOn(addSource)
 tasks.checkGwt.dependsOn(addSource)
 
-sourceCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_17
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
 
 eclipse.project.name = appName + "-html"
