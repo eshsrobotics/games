@@ -10,6 +10,7 @@ programs together.
     - [Installing the Visual Studio Code plugins](#installing-the-Visual-Studio-Code-plugins)
   - [Cloning the repository](#cloning-the-repository)
 - [libGDX Cheatsheet](#libgdx-cheatsheet)
+- [Common problems](#common-problems)
 
 ## How to set up your computer
 
@@ -19,10 +20,10 @@ programs together.
     - It's not the best text editor in the world (_not even close_), but it
       does have a useful realtime collaboration plugin that allows all of us
       to work on the same code at the same time and see each other's edits.
-2. **OpenJDK 17** — Java Development Kit (compiler and runtime)
+2. ![icon](docs/java.png)**OpenJDK 17** — Java Development Kit (compiler and runtime)
     - We decided on 2023-06-01 that the first game would be written in Java,
       since that's  what the students are learning in AP Computer Science.
-3. **Git** — Version control tool
+3. ![icon](docs/git.png)**Git** — Version control tool
     - Git allows us to easily document, share, search through, and merge
       changes even when our edits diverge.  Our club only uses the terminal
       version of Git.
@@ -89,7 +90,9 @@ These instructions rely on the [Homebrew](https://brew.sh) package manager.
 
 1. Install Visual Studio Code: `brew install visual-studio-code`
     - Please pin it to your Dock to make it easy to open in the future.
-2. Install OpenJDK 17: `brew install temurin17`
+2. Install OpenJDK 17: `brew install openjdk@17`
+    - You'll probably need to set `$JAVA_HOME` as well.  See [Common
+      Problem #1](#common-problems) for more details.
 3. Install Git: `brew install git`
 
 ### Installing the Visual Studio Code plugins
@@ -151,55 +154,13 @@ library that combines several popular game-related frameworks.  It uses Gradle
 for building and running, so there are a number of important Gradle targets:
 
 1. Compiling and testing:
-    - `./gradlew build`: Builds the application for all output environments.
-        - If you see a project build fail with the following error:
-                <pre>
-                  Error: Could not find or load main class org.gradle.wrapper.GradleWrapperMain
-                  Caused by: java.lang.ClassNotFoundException: org.gradle.wrapper.GradleWrapperMain
-                </pre>
-          Then you are the victim of **bad defaults** and a **bad error
-          message**.  A more sensible error message would have said:
-                <pre>
-                  Error: could not find gradle-wrapper.jar
-                  Did you accidentally add it to your .gitignore?
-                </pre>
-
-            - As it turns out, the `gdx-setup.jar` [project generation
-              wizard](https://libgdx.com/wiki/start/project-generation) creates
-              [broken
-              projects](https://support.snyk.io/hc/en-us/articles/360007745957-Snyk-test-Could-not-find-or-load-main-class-org-gradle-wrapper-GradleWrapperMain)
-              out of the box, since its `.gitignore` file excludes the directory
-              that it puts `gradle-wrapper.jar` in.  Without this JAR file,
-              `./gradlew` cannot operate.
-
-              The person who _runs_ the wizard will have a local copy of
-              `gradle-wrapper.jar`, but since it is automatically gitignored,
-              it will not be pushed upstream when they push the rest of their
-              code.  Everyone who pulls it will see the error message shown
-              above!
-
-            - To fix the problem, do the following:
-
-                1. Change `.gitignore` to add an exception for
-                   `gradle-wrapper.jar`.
-
-                   ``` diff
-
-                   @@ -93,6 +93,7 @@ nb-configuration.xml
-
-                    /local.properties
-                    .gradle/
-                   +!gradle/wrapper/gradle-wrapper.jar
-                    gradle-app.setting
-                    /build/
-                    /android/build/
-
-                   ```
-                1. `git add ./gradle/wrapper/gradle-wrapper.jar` so that other
-                   people can see it.
-
+    - `./gradlew build`: Builds the application for **all** output
+      environments.
+    - `./gradlew lwjgl3:build`: Builds just the desktop version of the
+      application.
+    - `./gradlew html:build`: Builds just the web version of the application.
 1. Running:
-    - `./gradlew desktop:run`: Runs the **desktop** version of the application
+    - `./gradlew lwjgl3:run`: Runs the **desktop** version of the application
     - `./gradlew html:superDev`: Runs the web application in _Super Dev mode_,
       which allows browser debugging and on-the-fly recompilation.
 
@@ -213,3 +174,91 @@ for building and running, so there are a number of important Gradle targets:
 
 You can add `--debug` at the end of any of these Gradle targets to get more
 information if something does wrong.
+
+## Common problems
+
+1. _**Q**: I'm on MacOS Ventura 13.3.1.  When I ran `./gradlew build`, I
+   encountered the following error:_
+
+    ```
+    Downloading https://services.gradle.org/distributions/gradle-7.6.1-bin.zip
+
+    Exception in thread "main" javax.net.ssl.SSLHandshakeException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+        at java.base/sun.security.ssl.Alert.createSSLException(Alert.java:131)
+        [...snip...]
+        at java.base/sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:434)
+        ... 31 more
+    ```
+
+   _What's going on?_<br/>_——Frustrated in Fresno_
+
+    - **A**: You probably haven't set your `$JAVA_HOME` environment variable,
+      so Java is looking for the `gradle.org` certificates in the wrong place.
+
+
+        MacOS Homebrew installs OpenJDK 17 in `/usr/local/opt/openjdk@17`,
+        so you should add:
+
+        ```sh
+        # Point Java tools at OpenJDK 17 (necessary for libGDX game
+        # development)
+        export JAVA_HOME=/usr/local/opt/openjdk@17
+        ```
+
+        to a Bash initialization script such as `$HOME/.profile`.  (If that file does not
+        exist, you will need to create it.)  After saving this change, any
+        future shells you run will have `$JAVA_HOME` set, and you should be
+        able to build.
+
+1. _**Q**: Why is my project build failing with this error?_
+
+    ```
+    Error: Could not find or load main class org.gradle.wrapper.GradleWrapperMain
+    Caused by: java.lang.ClassNotFoundException: org.gradle.wrapper.GradleWrapperMain
+    ```
+
+   _——Flabbergasted Floridian_
+
+    - **A**: You are the victim of **bad defaults** and a **bad error
+      message**.  A more sensible error message would have said:
+
+        ```
+        Error: could not find gradle-wrapper.jar
+        Did you accidentally add it to your .gitignore?
+        ```
+        - As it turns out, the `gdx-setup.jar` [project generation
+          wizard](https://libgdx.com/wiki/start/project-generation) creates
+          [broken
+          projects](https://support.snyk.io/hc/en-us/articles/360007745957-Snyk-test-Could-not-find-or-load-main-class-org-gradle-wrapper-GradleWrapperMain)
+          out of the box, since its `.gitignore` file excludes the directory
+          that it puts `gradle-wrapper.jar` in.  Without this JAR file,
+          `./gradlew` cannot operate.
+
+          The person who _runs_ the wizard will have a local copy of
+          `gradle-wrapper.jar`, but since it is automatically gitignored, it
+          will not be pushed upstream when they push the rest of their code.
+          Everyone who pulls it will see the error message shown above!
+
+        - To fix the problem, do the following:
+
+            1. Change `.gitignore` to add an exception for
+               `gradle-wrapper.jar`.
+
+               ``` diff
+
+               @@ -93,6 +93,7 @@ nb-configuration.xml
+
+                /local.properties
+                .gradle/
+               +!gradle/wrapper/gradle-wrapper.jar
+                gradle-app.setting
+                /build/
+                /android/build/
+
+               ```
+            1. `git add ./gradle/wrapper/gradle-wrapper.jar` so that other
+               people can see it.
+
+        - This problem is one of several reasons that we migrated the project
+          from using `gdx-setup.jar` to using
+          [gdx-liftoff](https://github.com/tommyettinger/gdx-liftoff).
