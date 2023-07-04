@@ -1,0 +1,157 @@
+tiles-optimized.png
+size: 472,374
+format: RGBA8888
+filter: Nearest,Nearest
+sprite1
+  rotate: false
+  xy: 360, 234
+  size: 80, 63
+  offset: 0, 0
+  index: -1
+sprite2
+  rotate: false
+  xy: 360, 298
+  size: 80, 64
+  orig: 80, 64
+  offset: 0, 0
+  index: -1
+sprite3
+  rotate: false
+  xy: 309, 198
+  size: 47, 80
+  orig: 47, 80
+  offset: 0, 0
+  index: -1
+sprite4
+  rotate: false
+  xy: 247, 117
+  size: 47, 80
+  orig: 47, 80
+  offset: 0, 0
+  index: -1
+sprite5
+  rotate: false
+  xy: 247, 198
+  size: 61, 80
+  orig: 61, 80
+  offset: 0, 0
+  index: -1
+sprite6
+  rotate: false
+  xy: 295, 117
+  size: 61, 80
+  orig: 61, 80
+  offset: 0, 0
+  index: -1
+sprite7
+  rotate: false
+  xy: 0, 306
+  size: 176, 68
+  orig: 176, 68
+  offset: 0, 0
+  index: -1
+sprite8
+  rotate: false
+  xy: 113, 189
+  size: 80, 59
+  orig: 80, 59
+  offset: 0, 0
+  index: -1
+sprite9
+  rotate: false
+  xy: 113, 249
+  size: 80, 56
+  orig: 80, 56
+  offset: 0, 0
+  index: -1
+sprite10
+  rotate: false
+  xy: 360, 0
+  size: 112, 116
+  orig: 112, 116
+  offset: 0, 0
+  index: -1
+sprite11
+  rotate: false
+  xy: 247, 0
+  size: 112, 116
+  orig: 112, 116
+  offset: 0, 0
+  index: -1
+sprite12
+  rotate: false
+  xy: 177, 306
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+sprite13
+  rotate: false
+  xy: 182, 65
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+sprite14
+  rotate: false
+  xy: 242, 306
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+sprite15
+  rotate: false
+  xy: 182, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+sprite16
+  rotate: false
+  xy: 360, 117
+  size: 112, 116
+  orig: 112, 116
+  offset: 0, 0
+  index: -1
+sprite17
+  rotate: false
+  xy: 0, 189
+  size: 112, 116
+  orig: 112, 116
+  offset: 0, 0
+  index: -1
+sprite18
+  rotate: false
+  xy: 194, 189
+  size: 52, 56
+  orig: 52, 56
+  offset: 0, 0
+  index: -1
+sprite19
+  rotate: false
+  xy: 182, 130
+  size: 52, 56
+  orig: 52, 56
+  offset: 0, 0
+  index: -1
+sprite20
+  rotate: false
+  xy: 0, 0
+  size: 181, 188
+  orig: 181, 188
+  offset: 0, 0
+  index: -1
+sprite21
+  rotate: false
+  xy: 307, 306
+  size: 52, 56
+  orig: 52, 56
+  offset: 0, 0
+  index: -1
+sprite22
+  rotate: false
+  xy: 194, 249
+  size: 52, 56
+  orig: 52, 56
+  offset: 0, 0
+  index: -1
