@@ -1,16 +1,22 @@
 package com.github.eshsrobotics.watergame;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapLayers;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.Input.Keys;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -21,22 +27,15 @@ public class Main extends ApplicationAdapter {
     private int x;
     private int y;
 
-    // This is the game world.
-    private List<TileType> world_tiles;
-    private final int world_rows = 5, world_columns = 5;
-    private final int tile_width = 32, tile_height = 32; // In pixels.
+    TiledMap myMap;
+    OrthogonalTiledMapRenderer renderer;
+    OrthographicCamera camera;
 
     // Our position in the game world, in pixels.
     private int world_x, world_y;
 
     // This is the list of textures that the game world can choose from.
-    private Map<TileType, Texture> textures;
-
-    private enum TileType {
-        // Only four of these came from OpenGameArt.
-        FLOOR, CORNER_L, CORNER_R, WALL, BLANK
-    }
-
+    private Map<Character, Texture> textures;
 
     /**
      * Code to execute when the game starts.
@@ -51,97 +50,122 @@ public class Main extends ApplicationAdapter {
 
         // Populate the list of possible textures (so that the world indices
         // have meaning.)
-        textures = new HashMap<TileType, Texture>(4);
-        textures.put(TileType.CORNER_L, new Texture("Basic_Ground_CornerL_Pixel.png"));
-        textures.put(TileType.CORNER_R, new Texture("Basic_Ground_CornerR_Pixel - Copy.png"));
-        textures.put(TileType.WALL, new Texture("Basic_Ground_Filler_Pixel.png"));
-        textures.put(TileType.FLOOR, new Texture("Basic_Ground_Top_Pixel.png"));
 
-        // Make a world.
-        world_tiles = new ArrayList<TileType>(Arrays.asList(
-            TileType.WALL,     TileType.BLANK, TileType.WALL,  TileType.WALL,     TileType.BLANK,
-            TileType.WALL,     TileType.WALL,  TileType.WALL,  TileType.WALL,     TileType.WALL,
-            TileType.WALL,     TileType.BLANK, TileType.BLANK, TileType.WALL,     TileType.BLANK,
-            TileType.CORNER_L, TileType.FLOOR, TileType.FLOOR, TileType.CORNER_R, TileType.BLANK,
-            TileType.BLANK,    TileType.BLANK, TileType.BLANK, TileType.BLANK,    TileType.BLANK
-        ));
+        textures = new HashMap<>();
+        textures.put('p', new Texture("Basic_Ground_CornerL_Pixel.png"));
+        textures.put('q', new Texture("Basic_Ground_CornerR_Pixel - Copy.png"));
+        textures.put('*', new Texture("Basic_Ground_Filler_Pixel.png"));
+        textures.put('o', new Texture("Basic_Ground_Top_Pixel.png"));
+
+        final String world =
+        "pooooooq    pooooq\n" +
+        "  ******q    *****\n" +
+        "   ******q     ***\n" +
+        "poq  *****q   p***\n" +
+        "***********ooo****\n" +
+        "******************";
+
+        myMap = new TiledMap();
+        TiledMapTileLayer levelTiles = createTileLayer(world, 32, 32);
+        levelTiles.setName("level");
+        MapLayers layers = myMap.getLayers();
+        layers.add(levelTiles);
+
+        // 32 pixels (the size of a single tile) corresponds to one world unit
+        final float unitScale = 1.0f / 32;
+
+        renderer = new OrthogonalTiledMapRenderer(myMap, unitScale);
+        camera = new OrthographicCamera();
+
+        final float viewportWidth = 5, viewportHeight = 3;
+        camera.setToOrtho(false, viewportWidth, viewportHeight);
+    }
+
+    /**
+     * Converts a string into a {@link TiledMapTileLayer tile layer}.
+     *
+     * <p>We do this by iterating over the string line by line (we look for newline
+     * characters in order to find the end of each line.)  To the extent that
+     * the lines are different lengths, all lines are right-padded with spaces
+     * until they have the length of the longest line.</p>
+     *
+     * <p>After that. we convert each character to its tile equivalent using the
+     * {@link #textures} map as a guide.  Invalid characters are mapped to blank
+     * tiles.</p>
+     *
+     * @param mapDefinition    The string that we will convert into a map.  It
+     *                         should normally have newlines in it, or the map
+     *                         will all be on the same row (not fun to play, I
+     *                         assure you.)
+     * @param tileWidthPixels  Width of each tile in pixels.
+     * @param tileHeightPixels Height of each tile in pixels.
+     * @return Returns the equivalent tile layer.
+     */
+    private TiledMapTileLayer createTileLayer(String mapDefinition, int tileWidthPixels, int tileHeightPixels) {
+
+        final List<String> lines = Arrays.asList(mapDefinition.split("\n"));
+        String longestLine = lines.stream()
+            .max((line1, line2) -> line1.length() - line2.length())
+            .get(); // Will throw if mapDefinition is empty
+
+        // Right-pad all lines to the same length.
+        lines.replaceAll(line -> {
+            // return line + " ".repeat(longestLine.length() - line.length());
+            StringBuilder builder = new StringBuilder(line);
+            for (int i = 0; i < longestLine.length() - line.length(); ++i) {
+                builder.append(" ");
+            }
+            return builder.toString();
+        });
+
+        final int rows = lines.size();
+        final int columns = longestLine.length();
+        TiledMapTileLayer layer = new TiledMapTileLayer(columns, rows, tileWidthPixels, tileHeightPixels);
+
+        // Add cells to the layer according to the characters in the string.
+        for (int row = 0; row < rows; ++row) {
+            for (int column = 0; column < columns; ++column) {
+                final Character key = lines.get(row).charAt(column);
+                Texture texture = textures.getOrDefault(key, null);
+                if (texture != null) {
+                    TextureRegion region = new TextureRegion(texture);
+                    StaticTiledMapTile tile = new StaticTiledMapTile(region);
+                    Cell cell = new Cell();
+                    cell.setTile(tile);
+                    layer.setCell(column, row, cell);
+                }
+            }
+        }
+        return layer;
     }
 
     @Override
     public void render() {
         if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-            x = x - 5;
+            camera.position.x -= 5;
+            // x = x - 5;
         }
         if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-            x = x + 5;
+            camera.position.x += 5;
+            // x = x + 5;
         }
         if (Gdx.input.isKeyPressed(Keys.UP)) {
-            y = y + 5;
+            camera.position.y += 5;
+            // y = y + 5;
         }
         if (Gdx.input.isKeyPressed(Keys.DOWN)) {
-            y = y - 5;
+            camera.position.y -= 5;
+            // y = y - 5;
         }
         Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         // renderSub(x, y);
-        world_x = x;
-        world_y = y;
-        renderTileLayer(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    }
 
-    /**
-     * Renders {@link #world_tiles the grid of tiles} as they would appear when
-     * the camera is centered at ({@link #world_x}, {@link #world_y}}.  The
-     * rendering is constrained to only appear on-screen at the rectangle
-     * ({@code vx},{@code vy})&#x40;{@code vw}x{@code vh}.
-     *
-     * No zooming is done, no seamless tiling is attempted, and the world must
-     * have a 1:1 size correspondence with the tile layer.  (Thus we don't
-     * support parallax layers that scroll more slowly than the foreground.)
-     */
-    private void renderTileLayer(int vx, int vy, int vw, int vh) {
-        batch.begin();
-        batch.draw(image, 140, 210);
-        batch.draw(sub, x, y);
-        for (float current_world_y = world_y - vh/2, current_screen_y = vy;
-             current_world_y <= world_y + vh/2;
-             current_world_y += tile_height, current_screen_y += tile_height) {
-
-            for (float current_world_x = world_x - vw/2, current_screen_x = vx;
-                  current_world_x <= world_x + vw/2;
-                  current_world_x += tile_width, current_screen_x += tile_width) {
-
-                final float tile_column = (float)Math.floor(current_world_x / tile_width);
-                final float tile_row = (float)Math.floor(current_world_y / tile_height);
-                if (tile_row < 0 || tile_row >= world_rows ||
-                    tile_column < 0 || tile_column >= world_columns) {
-                    // Location out of bounds.
-                    continue;
-                }
-                final int offset = (int)(world_columns * tile_row + tile_column);
-
-                final Texture current_texture = textures.get(world_tiles.get(offset));
-                if (current_texture == null) {
-                    // No such texture (perhaps we don't have an image for it yet.)
-                    // TODO: Add an ugly placeholder instead.
-                    continue;
-                }
-
-                // We don't want to start drawing the current tile at (x, y);
-                // that would be silly.  (The tiles would appear to slightly
-                // follow the player's movement, since (x, y) is not their real
-                // location.)
-                //
-                // Instead, we slightly reposition the current tile so as to
-                // take the current world position _within_ its tile into
-                // account.
-                float x_adjust = Math.floorMod(world_x, tile_width);
-                float y_adjust = Math.floorMod(world_y, tile_height);
-                x_adjust = y_adjust = 0;
-                batch.draw(current_texture, current_world_x + x_adjust, vy + current_world_y + y_adjust);
-            }
-        }
-        batch.end();
+        MapLayers layers = myMap.getLayers();
+        TiledMapTileLayer layer = (TiledMapTileLayer)layers.get("level");
+        renderer.getBatch().begin();
+        renderer.renderTileLayer(layer);
+        renderer.getBatch().end();
     }
 
     private void renderSub(float x, float y) {
@@ -153,6 +177,8 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void dispose() {
+        renderer.dispose();
+        myMap.dispose();
         batch.dispose();
         image.dispose();
     }
