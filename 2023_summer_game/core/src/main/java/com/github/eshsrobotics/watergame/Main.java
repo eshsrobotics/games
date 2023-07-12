@@ -40,8 +40,6 @@ public class Main extends ApplicationAdapter {
         batch = new SpriteBatch();
         image = new Texture("libgdx.png");
         sub = new Texture("submarine.png");
-        x = 0;
-        y = 0;
 
         // Populate the list of possible textures (so that the world indices
         // have meaning.)
@@ -128,7 +126,7 @@ public class Main extends ApplicationAdapter {
                     StaticTiledMapTile tile = new StaticTiledMapTile(region);
                     Cell cell = new Cell();
                     cell.setTile(tile);
-                    layer.setCell(column, row, cell);
+                    layer.setCell(column, (rows - 1) - row, cell);
                 }
             }
         }
