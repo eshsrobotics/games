@@ -106,6 +106,9 @@ These instructions rely on the [Homebrew](https://brew.sh) package manager.
        simultaneously edit the same buffers
     4. ![icon](docs/rewrap.png) _Rewrap_ - Allows you to word-wrap long lines
        using `Alt + Q` (`⌥Option + Q` on MacOS)
+    5. ![icon](docs/git-commit-message-editor.png) _Git Commit Message Editor_ -
+       Allows you to use a full editor buffer to type your commit messages
+       instead of a minimal textbox
     5. _Base16 Rebecca_ - Uche likes purple color themes
 
 ### Cloning the repository
