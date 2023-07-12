@@ -24,15 +24,10 @@ public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private Texture image;
     private Texture sub;
-    private int x;
-    private int y;
 
     TiledMap myMap;
     OrthogonalTiledMapRenderer renderer;
     OrthographicCamera camera;
-
-    // Our position in the game world, in pixels.
-    private int world_x, world_y;
 
     // This is the list of textures that the game world can choose from.
     private Map<Character, Texture> textures;
@@ -79,6 +74,7 @@ public class Main extends ApplicationAdapter {
 
         final float viewportWidth = 5, viewportHeight = 3;
         camera.setToOrtho(false, viewportWidth, viewportHeight);
+        renderer.setView(camera);
     }
 
     /**
@@ -142,30 +138,25 @@ public class Main extends ApplicationAdapter {
     @Override
     public void render() {
         if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-            camera.position.x -= 5;
-            // x = x - 5;
+            camera.position.x -= .05;
         }
         if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-            camera.position.x += 5;
-            // x = x + 5;
+            camera.position.x += .05;
         }
         if (Gdx.input.isKeyPressed(Keys.UP)) {
-            camera.position.y += 5;
-            // y = y + 5;
+            camera.position.y += .05;
         }
         if (Gdx.input.isKeyPressed(Keys.DOWN)) {
-            camera.position.y -= 5;
-            // y = y - 5;
+            camera.position.y -= .05;
         }
+
+        camera.update();
+        renderer.setView(camera);
         Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         // renderSub(x, y);
 
-        MapLayers layers = myMap.getLayers();
-        TiledMapTileLayer layer = (TiledMapTileLayer)layers.get("level");
-        renderer.getBatch().begin();
-        renderer.renderTileLayer(layer);
-        renderer.getBatch().end();
+        renderer.render();
     }
 
     private void renderSub(float x, float y) {
