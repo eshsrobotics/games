@@ -86,6 +86,7 @@ public class Main extends ApplicationAdapter {
                     // Pedestal texture?
                     row = 2;
                     column = 0;
+                    break;
                 case 3:
                     // Thing at the top of the pedestal
                     row = column = 6;
