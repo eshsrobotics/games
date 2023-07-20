@@ -30,6 +30,8 @@ public class Main extends ApplicationAdapter {
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
     private OrthographicCamera camera;
+    private Player p;
+
 
     /**
      * Initializes our game by creating our map (from scratch, using an array.
@@ -41,6 +43,18 @@ public class Main extends ApplicationAdapter {
         image = new Texture("libgdx.png");
         sub = new Texture("submarine.png");
         tileSet = new Texture("fantasy-tileset.png");
+
+        // Skull sprite: column 2, row 10.
+        final int PLAYER_SPRITE_COLUMN = 2;
+        final int PLAYER_SPRITE_ROW = 10;
+        final int TILE_WIDTH = 32;
+        final int TILE_HEIGHT = 32;
+        p = new Player(new TextureRegion(tileSet,
+                                         PLAYER_SPRITE_COLUMN * TILE_WIDTH,
+                                         PLAYER_SPRITE_ROW * TILE_HEIGHT,
+                                         TILE_WIDTH,
+                                         TILE_HEIGHT));
+
         map = new TiledMap();
         renderer = new OrthogonalTiledMapRenderer(map, 1.0f / 32);
         camera = new OrthographicCamera();
@@ -129,6 +143,10 @@ public class Main extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         renderer.render();
+        batch.begin();
+        p.render(batch, renderer.getViewBounds());
+        batch.end();
+
         // batch.begin();
         // batch.draw(image, 140, 210);
         // batch.draw(sub, x, y);
