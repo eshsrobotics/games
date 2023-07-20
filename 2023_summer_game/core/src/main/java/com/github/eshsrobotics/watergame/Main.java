@@ -4,11 +4,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Pixmap.Blending;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayers;
@@ -54,12 +59,12 @@ public class Main extends ApplicationAdapter {
         textures.put('o', new Texture("Basic_Ground_Top_Pixel.png"));
 
         final String world =
-        "pooooooq    pooooq\n" +
-        "  ******q    *****\n" +
-        "   ******q     ***\n" +
-        "poq  *****q   p***\n" +
-        "***********ooo****\n" +
-        "******************";
+            "pooooooq    pooooq\n" +
+            "  ******q    *****\n" +
+            "   ******q     ***\n" +
+            "poq  *****q   p***\n" +
+            "***********ooo****\n" +
+            "******************";
 
         myMap = new TiledMap();
         TiledMapTileLayer levelTiles = createTileLayer(world, 32, 32);
@@ -107,13 +112,13 @@ public class Main extends ApplicationAdapter {
 
         // Right-pad all lines to the same length.
         lines.replaceAll(line -> {
-            // return line + " ".repeat(longestLine.length() - line.length());
-            StringBuilder builder = new StringBuilder(line);
-            for (int i = 0; i < longestLine.length() - line.length(); ++i) {
-                builder.append(" ");
-            }
-            return builder.toString();
-        });
+                // return line + " ".repeat(longestLine.length() - line.length());
+                StringBuilder builder = new StringBuilder(line);
+                for (int i = 0; i < longestLine.length() - line.length(); ++i) {
+                    builder.append(" ");
+                }
+                return builder.toString();
+            });
 
         final int rows = lines.size();
         final int columns = longestLine.length();
@@ -134,6 +139,77 @@ public class Main extends ApplicationAdapter {
             }
         }
         return layer;
+    }
+
+    /**
+     * Procedurally generates a background image consisting of numerous
+     * pixelated stars of varying brightness. The generation is done in
+     * such a way that panning around the starfield by varying the
+     * (worldUpperLeftX, worldUpperLeftY) parameters will produce
+     * consistent stars in consistent locations.
+     *
+     * @param pixmap          The bitmap to render the startfield on.
+     * @param worldUpperLeftX The X coordinate of the upper left corner of
+     *                        the starfield in "world coordinates."
+     *                        <p>
+     *                        Importantly, generated star pixels at the
+     *                        same relative world coordinate will always
+     *                        look the same, whether that look is a black
+     *                        pixel or a brightened one.
+     * @param worldUpperLeftY The Y coordinate of the upper left corner of
+     *                        the starfield in "world coordinates."
+     * @param density         The density of the starfield, with 1.0 being
+     *                        the maximum and 0.0 representing an empty
+     *                        starfield.
+     * @param seed            Random number seed.
+     */
+    private void renderStarfieldpixmap(Pixmap destination, int worldUpperLeftX, int worldUpperLeftY,
+                                       double density, int seed) {
+
+        seed = 0;
+        destination.setBlending(Blending.None);
+        destination.setColor(new Color(0.0f, 0.05f, 0.3f, 0.0f));
+        destination.fill();
+
+        final Random generator = new Random();
+        final float min_hue = 45.0f,
+            max_hue = 170.0f,
+            min_saturation = 0.9f,
+            max_saturation = 1.0f,
+            min_value = 0.9f,
+            max_value = 1.0f;
+
+        final int ASSUMED_STARFIELD_WORLD_PIXEL_WIDTH = (int) 1e08;
+        for (int y = 0; y < destination.getHeight(); ++y) {
+            for (int x = 0; x < destination.getWidth(); ++x) {
+                // We assume the "world" to have a generous,
+                // but fixed width here so that we can readily
+                // convert (worldX, worldY) coordinates into
+                // world offsets (offset = width * y + x.)
+                //
+                // The world offset for a given star will be
+                // the same no matter where the "camera" is.
+                final int worldX = (worldUpperLeftX + x);
+                final int worldY = (worldUpperLeftY + y);
+                int worldOffset = worldY * ASSUMED_STARFIELD_WORLD_PIXEL_WIDTH + worldX;
+
+                generator.setSeed(seed + worldOffset);
+                if (generator.nextDouble() < density) {
+                    // The density and seed value have dictated that we must
+                    // generate some sort of star here.
+                    float u_h = generator.nextFloat(),
+                        u_s = generator.nextFloat(),
+                        u_v = generator.nextFloat();
+                    float h = min_hue + u_h * (max_hue - min_hue),
+                        s = min_saturation + u_s * (max_saturation - min_saturation),
+                        v = min_value + u_v * (max_value - min_value);
+
+                    Color starColor = new Color().fromHsv(h, s, v);
+                    destination.setColor(starColor);
+                    destination.drawRectangle(x, y, 1, 1);
+                }
+            }
+        }
     }
 
     @Override
