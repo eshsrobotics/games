@@ -1,22 +1,12 @@
 package com.github.eshsrobotics.watergame;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Pixmap.Blending;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
@@ -32,221 +22,139 @@ public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private Texture image;
     private Texture sub;
+    private Texture tileSet;
+    private int x;
+    private int y;
+    private int mapWidth = 14, mapHeight;
+    private List<Integer> mapLayout;
+    private TiledMap map;
+    private OrthogonalTiledMapRenderer renderer;
+    private OrthographicCamera camera;
+    private Player p;
 
-    TiledMap myMap;
-    OrthogonalTiledMapRenderer renderer;
-    OrthographicCamera camera;
-
-    // This is the list of textures that the game world can choose from.
-    private Map<Character, Texture> textures;
 
     /**
-     * Code to execute when the game starts.
+     * Initializes our game by creating our map (from scratch, using an array.
+     * I know.  Stop judging me.)
      */
     @Override
     public void create() {
         batch = new SpriteBatch();
         image = new Texture("libgdx.png");
         sub = new Texture("submarine.png");
+        tileSet = new Texture("fantasy-tileset.png");
 
-        // Populate the list of possible textures (so that the world indices
-        // have meaning.)
+        // Skull sprite: column 2, row 10.
+        final int PLAYER_SPRITE_COLUMN = 2;
+        final int PLAYER_SPRITE_ROW = 10;
+        final int TILE_WIDTH = 32;
+        final int TILE_HEIGHT = 32;
+        p = new Player(new TextureRegion(tileSet,
+                                         PLAYER_SPRITE_COLUMN * TILE_WIDTH,
+                                         PLAYER_SPRITE_ROW * TILE_HEIGHT,
+                                         TILE_WIDTH,
+                                         TILE_HEIGHT));
 
-        textures = new HashMap<>();
-        textures.put('p', new Texture("Basic_Ground_CornerL_Pixel.png"));
-        textures.put('q', new Texture("Basic_Ground_CornerR_Pixel - Copy.png"));
-        textures.put('*', new Texture("Basic_Ground_Filler_Pixel.png"));
-        textures.put('o', new Texture("Basic_Ground_Top_Pixel.png"));
-
-        final String world =
-            "pooooooq    pooooq\n" +
-            "  ******q    *****\n" +
-            "   ******q     ***\n" +
-            "poq  *****q   p***\n" +
-            "***********ooo****\n" +
-            "******************";
-
-        myMap = new TiledMap();
-        TiledMapTileLayer levelTiles = createTileLayer(world, 32, 32);
-        levelTiles.setName("level");
-        MapLayers layers = myMap.getLayers();
-        layers.add(levelTiles);
-
-        // 32 pixels (the size of a single tile) corresponds to one world unit
-        final float unitScale = 1.0f / 32;
-
-        renderer = new OrthogonalTiledMapRenderer(myMap, unitScale);
+        map = new TiledMap();
+        renderer = new OrthogonalTiledMapRenderer(map, 1.0f / 32);
         camera = new OrthographicCamera();
-
-        final float viewportWidth = 5, viewportHeight = 3;
-        camera.setToOrtho(false, viewportWidth, viewportHeight);
+        camera.setToOrtho(false, 12, 12);
         renderer.setView(camera);
-    }
 
-    /**
-     * Converts a string into a {@link TiledMapTileLayer tile layer}.
-     *
-     * <p>We do this by iterating over the string line by line (we look for newline
-     * characters in order to find the end of each line.)  To the extent that
-     * the lines are different lengths, all lines are right-padded with spaces
-     * until they have the length of the longest line.</p>
-     *
-     * <p>After that. we convert each character to its tile equivalent using the
-     * {@link #textures} map as a guide.  Invalid characters are mapped to blank
-     * tiles.</p>
-     *
-     * @param mapDefinition    The string that we will convert into a map.  It
-     *                         should normally have newlines in it, or the map
-     *                         will all be on the same row (not fun to play, I
-     *                         assure you.)
-     * @param tileWidthPixels  Width of each tile in pixels.
-     * @param tileHeightPixels Height of each tile in pixels.
-     * @return Returns the equivalent tile layer.
-     */
-    private TiledMapTileLayer createTileLayer(String mapDefinition, int tileWidthPixels, int tileHeightPixels) {
+        mapLayout = Arrays.asList(
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+        );
+        mapHeight = mapLayout.size() / mapWidth;
+        x = 0;
+        y = 0;
 
-        final List<String> lines = Arrays.asList(mapDefinition.split("\n"));
-        String longestLine = lines.stream()
-            .max((line1, line2) -> line1.length() - line2.length())
-            .get(); // Will throw if mapDefinition is empty
+        TiledMapTileLayer layer = new TiledMapTileLayer(mapWidth, mapHeight, 32, 32);
+        for (int i = 0; i < mapLayout.size(); i++) {
 
-        // Right-pad all lines to the same length.
-        lines.replaceAll(line -> {
-                // return line + " ".repeat(longestLine.length() - line.length());
-                StringBuilder builder = new StringBuilder(line);
-                for (int i = 0; i < longestLine.length() - line.length(); ++i) {
-                    builder.append(" ");
-                }
-                return builder.toString();
-            });
+            TextureRegion region = null;
+            int value = mapLayout.get(i);
+            int row, column;
 
-        final int rows = lines.size();
-        final int columns = longestLine.length();
-        TiledMapTileLayer layer = new TiledMapTileLayer(columns, rows, tileWidthPixels, tileHeightPixels);
-
-        // Add cells to the layer according to the characters in the string.
-        for (int row = 0; row < rows; ++row) {
-            for (int column = 0; column < columns; ++column) {
-                final Character key = lines.get(row).charAt(column);
-                Texture texture = textures.getOrDefault(key, null);
-                if (texture != null) {
-                    TextureRegion region = new TextureRegion(texture);
-                    StaticTiledMapTile tile = new StaticTiledMapTile(region);
-                    Cell cell = new Cell();
-                    cell.setTile(tile);
-                    layer.setCell(column, (rows - 1) - row, cell);
-                }
+            switch(value) {
+                case 0:
+                    // Upper left corner texture is the "emptiest", I guess.
+                    row = column = 0;
+                    break;
+                case 1:
+                    // Wall texture
+                    row = column = 1;
+                    break;
+                case 2:
+                    // Pedestal texture?
+                    row = 2;
+                    column = 0;
+                    break;
+                case 3:
+                    // Thing at the top of the pedestal
+                    row = column = 6;
+                    break;
+                default:
+                    // Something ridiculous, to test for bugs
+                    row = 2;
+                    column = 6;
+                    break;
             }
+            region = new TextureRegion(tileSet, row * 32, column * 32, 32, 32);
+            Cell cell = new Cell();
+            cell.setTile(new StaticTiledMapTile(region));
+            int x = i % mapWidth;
+            int y = i / mapWidth;
+            layer.setCell(x, mapHeight - y + 1, cell);
         }
-        return layer;
-    }
-
-    /**
-     * Procedurally generates a background image consisting of numerous
-     * pixelated stars of varying brightness. The generation is done in
-     * such a way that panning around the starfield by varying the
-     * (worldUpperLeftX, worldUpperLeftY) parameters will produce
-     * consistent stars in consistent locations.
-     *
-     * @param pixmap          The bitmap to render the startfield on.
-     * @param worldUpperLeftX The X coordinate of the upper left corner of
-     *                        the starfield in "world coordinates."
-     *                        <p>
-     *                        Importantly, generated star pixels at the
-     *                        same relative world coordinate will always
-     *                        look the same, whether that look is a black
-     *                        pixel or a brightened one.
-     * @param worldUpperLeftY The Y coordinate of the upper left corner of
-     *                        the starfield in "world coordinates."
-     * @param density         The density of the starfield, with 1.0 being
-     *                        the maximum and 0.0 representing an empty
-     *                        starfield.
-     * @param seed            Random number seed.
-     */
-    private void renderStarfieldpixmap(Pixmap destination, int worldUpperLeftX, int worldUpperLeftY,
-                                       double density, int seed) {
-
-        seed = 0;
-        destination.setBlending(Blending.None);
-        destination.setColor(new Color(0.0f, 0.05f, 0.3f, 0.0f));
-        destination.fill();
-
-        final Random generator = new Random();
-        final float min_hue = 45.0f,
-            max_hue = 170.0f,
-            min_saturation = 0.9f,
-            max_saturation = 1.0f,
-            min_value = 0.9f,
-            max_value = 1.0f;
-
-        final int ASSUMED_STARFIELD_WORLD_PIXEL_WIDTH = (int) 1e08;
-        for (int y = 0; y < destination.getHeight(); ++y) {
-            for (int x = 0; x < destination.getWidth(); ++x) {
-                // We assume the "world" to have a generous,
-                // but fixed width here so that we can readily
-                // convert (worldX, worldY) coordinates into
-                // world offsets (offset = width * y + x.)
-                //
-                // The world offset for a given star will be
-                // the same no matter where the "camera" is.
-                final int worldX = (worldUpperLeftX + x);
-                final int worldY = (worldUpperLeftY + y);
-                int worldOffset = worldY * ASSUMED_STARFIELD_WORLD_PIXEL_WIDTH + worldX;
-
-                generator.setSeed(seed + worldOffset);
-                if (generator.nextDouble() < density) {
-                    // The density and seed value have dictated that we must
-                    // generate some sort of star here.
-                    float u_h = generator.nextFloat(),
-                        u_s = generator.nextFloat(),
-                        u_v = generator.nextFloat();
-                    float h = min_hue + u_h * (max_hue - min_hue),
-                        s = min_saturation + u_s * (max_saturation - min_saturation),
-                        v = min_value + u_v * (max_value - min_value);
-
-                    Color starColor = new Color().fromHsv(h, s, v);
-                    destination.setColor(starColor);
-                    destination.drawRectangle(x, y, 1, 1);
-                }
-            }
-        }
+        layer.setName("layer");
+        map.getLayers().add(layer);
     }
 
     @Override
     public void render() {
         if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-            camera.position.x -= .05;
+            camera.position.x -= 0.1;
         }
         if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-            camera.position.x += .05;
+            camera.position.x += 0.1;
         }
         if (Gdx.input.isKeyPressed(Keys.UP)) {
-            camera.position.y += .05;
+            camera.position.y += 0.1;
         }
         if (Gdx.input.isKeyPressed(Keys.DOWN)) {
-            camera.position.y -= .05;
+            camera.position.y -= 0.1;
         }
-
         camera.update();
         renderer.setView(camera);
+
         Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        // renderSub(x, y);
 
         renderer.render();
-    }
-
-    private void renderSub(float x, float y) {
         batch.begin();
-        batch.draw(image, 140, 210);
-        batch.draw(sub, x, y);
+        p.render(batch, renderer.getViewBounds());
         batch.end();
+
+        // batch.begin();
+        // batch.draw(image, 140, 210);
+        // batch.draw(sub, x, y);
+        // batch.end();
     }
 
     @Override
     public void dispose() {
-        renderer.dispose();
-        myMap.dispose();
         batch.dispose();
         image.dispose();
     }
