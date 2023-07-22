@@ -32,34 +32,15 @@ public class Main extends ApplicationAdapter {
     private OrthographicCamera camera;
     private Player p;
 
-
-    /**
-     * Initializes our game by creating our map (from scratch, using an array.
-     * I know.  Stop judging me.)
+    /***
+     * Generates a map using an array.
+     *
+     * @return Returns a working map that has something like a pedestal in it,
+     * or something.  There are no MapObject layers and only one tile layer.
      */
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
-        sub = new Texture("submarine.png");
-        tileSet = new Texture("fantasy-tileset.png");
-
-        // Skull sprite: column 2, row 10.
-        final int PLAYER_SPRITE_COLUMN = 2;
-        final int PLAYER_SPRITE_ROW = 10;
-        final int TILE_WIDTH = 32;
-        final int TILE_HEIGHT = 32;
-        p = new Player(new TextureRegion(tileSet,
-                                         PLAYER_SPRITE_COLUMN * TILE_WIDTH,
-                                         PLAYER_SPRITE_ROW * TILE_HEIGHT,
-                                         TILE_WIDTH,
-                                         TILE_HEIGHT));
+    private TiledMap generateTiledMapOldFashioned() {
 
         map = new TiledMap();
-        renderer = new OrthogonalTiledMapRenderer(map, 1.0f / 32);
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 12, 12);
-        renderer.setView(camera);
 
         mapLayout = Arrays.asList(
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -105,6 +86,12 @@ public class Main extends ApplicationAdapter {
                     // Thing at the top of the pedestal
                     row = column = 6;
                     break;
+                case 4:
+                    // Foreground tiles used to mark the pedestal room
+                    row = 3;
+                    column = 7;
+                    foreground = true;
+                    break;
                 default:
                     // Something ridiculous, to test for bugs
                     row = 2;
@@ -120,6 +107,34 @@ public class Main extends ApplicationAdapter {
         }
         layer.setName("layer");
         map.getLayers().add(layer);
+    /**
+     * Initializes our game by creating our map (from scratch, using an array.
+     * I know.  Stop judging me.)
+     */
+    @Override
+    public void create() {
+        batch = new SpriteBatch();
+        image = new Texture("libgdx.png");
+        sub = new Texture("submarine.png");
+        tileSet = new Texture("fantasy-tileset.png");
+
+        // Skull sprite: column 2, row 10.
+        final int PLAYER_SPRITE_COLUMN = 2;
+        final int PLAYER_SPRITE_ROW = 10;
+        final int TILE_WIDTH = 32;
+        final int TILE_HEIGHT = 32;
+        p = new Player(new TextureRegion(tileSet,
+                                         PLAYER_SPRITE_COLUMN * TILE_WIDTH,
+                                         PLAYER_SPRITE_ROW * TILE_HEIGHT,
+                                         TILE_WIDTH,
+                                         TILE_HEIGHT));
+
+        map = generateTiledMapOldFashioned();
+        renderer = new OrthogonalTiledMapRenderer(map, 1.0f / 32);
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, 12, 12);
+        renderer.setView(camera);
+
     }
 
     @Override
