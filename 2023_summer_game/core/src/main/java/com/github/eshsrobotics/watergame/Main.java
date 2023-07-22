@@ -86,12 +86,6 @@ public class Main extends ApplicationAdapter {
                     // Thing at the top of the pedestal
                     row = column = 6;
                     break;
-                case 4:
-                    // Foreground tiles used to mark the pedestal room
-                    row = 3;
-                    column = 7;
-                    foreground = true;
-                    break;
                 default:
                     // Something ridiculous, to test for bugs
                     row = 2;
@@ -107,6 +101,9 @@ public class Main extends ApplicationAdapter {
         }
         layer.setName("layer");
         map.getLayers().add(layer);
+        return map;
+    }
+
     /**
      * Initializes our game by creating our map (from scratch, using an array.
      * I know.  Stop judging me.)
