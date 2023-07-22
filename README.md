@@ -44,7 +44,7 @@ programs together.
     use VSCode to do it:
 
     - Open VSCode.
-    - Type `Ctrl + Shift + P` to activate the Command Palette.
+    - Type <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> to activate the Command Palette.
     - Within the Palette, type "`install jdk`" and you should see a *Java:
        Install New JDK* entry or the like; activate it.
     - Click the giant Download button.
