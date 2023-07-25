@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
@@ -104,6 +105,11 @@ public class Main extends ApplicationAdapter {
         return map;
     }
 
+    TiledMap getTMXMap() {
+        TiledMap map = new TmxMapLoader().load("untitled.tmx");
+        return map;
+    }
+
     /**
      * Initializes our game by creating our map (from scratch, using an array.
      * I know.  Stop judging me.)
@@ -126,7 +132,7 @@ public class Main extends ApplicationAdapter {
                                          TILE_WIDTH,
                                          TILE_HEIGHT));
 
-        map = generateTiledMapOldFashioned();
+        map = getTMXMap ();
         renderer = new OrthogonalTiledMapRenderer(map, 1.0f / 32);
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 12, 12);
@@ -137,17 +143,19 @@ public class Main extends ApplicationAdapter {
     @Override
     public void render() {
         if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-            camera.position.x -= 0.1;
+            p.getSprite().setX(p.getSprite().getX() - 0.2f);
         }
         if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-            camera.position.x += 0.1;
+            p.getSprite().setX(p.getSprite().getX() + 0.2f);
         }
         if (Gdx.input.isKeyPressed(Keys.UP)) {
-            camera.position.y += 0.1;
+           p.getSprite().setY(p.getSprite().getY() + 0.2f);
         }
         if (Gdx.input.isKeyPressed(Keys.DOWN)) {
-            camera.position.y -= 0.1;
+            p.getSprite().setY(p.getSprite().getY() - 0.2f);
         }
+        camera.position.x = p.getSprite().getX();
+        camera.position.y = p.getSprite().getY();
         camera.update();
         renderer.setView(camera);
 
@@ -155,8 +163,11 @@ public class Main extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         renderer.render();
+
+        // Render the player on top of the tiles.
+        batch.setProjectionMatrix(camera.combined);//Not working?
         batch.begin();
-        p.render(batch, renderer.getViewBounds());
+        p.render(batch);
         batch.end();
 
         // batch.begin();

@@ -1,6 +1,7 @@
 package com.github.eshsrobotics.watergame;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -16,14 +17,9 @@ public class Player {
     private TextureRegion region;
 
     /**
-     * The player's X coordinate.
+     * The player's image, along with position information.
      */
-    private float x;
-
-    /**
-     * The player's Y coordinate.
-     */
-    private float y;
+    private Sprite playerSprite;
 
 
 
@@ -41,8 +37,10 @@ public class Player {
 
         // We don't really know where the player will ultimately be on the map.
         // We do need to initialize it to SOME value, and this is some value.
-        this.x = 0;
-        this.y = 0;
+        //
+        // We are setting the sprite's position in world pixel coordinates.
+        this.playerSprite = new Sprite(region);
+        this.playerSprite.setPosition(0, 0);
     }
 
     /**
@@ -52,19 +50,18 @@ public class Player {
      * @param batch      The batch that is currently being (or is about to be)
      *                   drawn on-screen.  This will nominally be the batch used
      *                   by your renderer.
-     * @param viewBounds The rectangle where all the on-screen drawing is taking
-     *                   place.
      */
-    public void render(Batch batch, Rectangle viewBounds) {
+    public void render(Batch batch) {
+        batch.draw(this.region, this.playerSprite.getX(), this.playerSprite.getY());
+    }
 
-        // Given the viewBounds rectangle, where is the center of the screen?
-        float centerX = viewBounds.x + viewBounds.width/2;
-        float centerY = viewBounds.y + viewBounds.height/2;
-
-        batch.draw(region,
-                   centerX - region.getRegionWidth() / 2,
-                   centerY - region.getRegionHeight() / 2);
-
+    /**
+     * Returns the player sprite.  The sprite has additional properties, such as
+     * boundaries, a scale factor, and coordinates, which can be used for
+     * rendering and collision detection purposes.
+     */
+    public Sprite getSprite() {
+        return this.playerSprite;
     }
 
     // int i; // <-- i is a variable of type int.
