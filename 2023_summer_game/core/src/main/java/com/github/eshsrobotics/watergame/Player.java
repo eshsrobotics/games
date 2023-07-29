@@ -1,9 +1,11 @@
 package com.github.eshsrobotics.watergame;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * This object represents the player (the submarine navigating through the
@@ -50,9 +52,16 @@ public class Player {
      * @param batch      The batch that is currently being (or is about to be)
      *                   drawn on-screen.  This will nominally be the batch used
      *                   by your renderer.
+     *
+     * @param camera     The camera used to convert world coordinates to screen
+     *                   coordinates
      */
-    public void render(Batch batch) {
-        batch.draw(this.region, this.playerSprite.getX(), this.playerSprite.getY());
+    public void render(Batch batch, OrthographicCamera camera) {
+        Vector3 worldPosition = new Vector3(this.playerSprite.getX(),
+                                            this.playerSprite.getY(),
+                                            0);
+        Vector3 screenPosition = camera.project(worldPosition);
+        batch.draw(this.region, screenPosition.x, screenPosition.y);
     }
 
     /**

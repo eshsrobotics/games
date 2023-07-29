@@ -165,9 +165,8 @@ public class Main extends ApplicationAdapter {
         renderer.render();
 
         // Render the player on top of the tiles.
-        batch.setProjectionMatrix(camera.combined);//Not working?
         batch.begin();
-        p.render(batch);
+        p.render(batch, camera);
         batch.end();
 
         // batch.begin();
