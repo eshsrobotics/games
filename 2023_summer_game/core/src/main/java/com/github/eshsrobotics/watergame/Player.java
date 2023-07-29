@@ -1,8 +1,10 @@
 package com.github.eshsrobotics.watergame;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * This object represents the player (the submarine navigating through the
@@ -55,15 +57,11 @@ public class Player {
      * @param viewBounds The rectangle where all the on-screen drawing is taking
      *                   place.
      */
-    public void render(Batch batch, Rectangle viewBounds) {
-
-        // Given the viewBounds rectangle, where is the center of the screen?
-        float centerX = viewBounds.x + viewBounds.width/2;
-        float centerY = viewBounds.y + viewBounds.height/2;
-
-        batch.draw(region,
-                   centerX - region.getRegionWidth() / 2,
-                   centerY - region.getRegionHeight() / 2);
+    public void render(Batch batch, OrthographicCamera camera) {
+        Vector3 worldPosition = new Vector3(this.playerSprite.getX(), this.playerSprite.getY(), 0);
+        Vector3 screenPosition = camera.project(worldPosition);
+        batch.draw(this.region, screenPosition.x, screenPosition.y);
+    }
 
     }
 
