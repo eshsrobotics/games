@@ -2,6 +2,7 @@ package com.github.eshsrobotics.watergame;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -13,21 +14,14 @@ import com.badlogic.gdx.math.Vector3;
 public class Player {
 
     /**
-     * The texture region we'll be grabbing the player sprite from.
+     * The Sprite that keeps track of the player's position and orientation
+     * for clipping, collision, and display purposes.
      */
-    private TextureRegion region;
+    private Sprite playerSprite;
 
-    /**
-     * The player's X coordinate.
-     */
-    private float x;
-
-    /**
-     * The player's Y coordinate.
-     */
-    private float y;
-
-
+    public Sprite getSprite() {
+        return playerSprite;
+    }
 
     /**
      * Creates a new, valid instance of the Player class.
@@ -39,12 +33,11 @@ public class Player {
 
         // Copy the region argument into one of our member variables so other
         // methods have access to it.
-        this.region = region;
+        this.playerSprite = new Sprite(region);
 
         // We don't really know where the player will ultimately be on the map.
         // We do need to initialize it to SOME value, and this is some value.
-        this.x = 0;
-        this.y = 0;
+        this.playerSprite.setPosition(0, 0);
     }
 
     /**
@@ -60,36 +53,6 @@ public class Player {
     public void render(Batch batch, OrthographicCamera camera) {
         Vector3 worldPosition = new Vector3(this.playerSprite.getX(), this.playerSprite.getY(), 0);
         Vector3 screenPosition = camera.project(worldPosition);
-        batch.draw(this.region, screenPosition.x, screenPosition.y);
+        batch.draw(this.playerSprite, screenPosition.x, screenPosition.y);
     }
-
-    }
-
-    // int i; // <-- i is a variable of type int.
-    // public class Point {
-    // float x;
-    // float y;
-    // void translate(float dx, float dy) { x += dx; y += dy; }
-    // };
-    // // A += B -> A = A + B
-    // // Great if you have just one point
-    // float x = 10;
-    // float y = 30;
-    //
-    // But I need more: I need 1000 points to represent the positions of bullets in
-    // my game
-    //
-    // float x1, x2, x3, /*...*/, x999, x1000; // Foolish
-    // float[] x = new float[1000], y = new float[1000]; // Slightly less foolish
-    // (parallel arrays)
-    // Point[] coordinates = new Point[1000]; // Smart: Boom! 1,000 x and y values.
-    //
-    // Point p = new Point();
-    // p.x = 10; // x and y are fields of the Point class.
-    // p.y = 30; // p is an instance of the Point class. (Use "new" to create
-    // instances.)
-    // p.translate(10, 10);
-    // // p.x is now: 20
-    // // p.y is now: 40
-
 }
