@@ -8,14 +8,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.Input.Keys;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -33,77 +28,10 @@ public class Main extends ApplicationAdapter {
     private OrthographicCamera camera;
     private Player p;
 
-    /***
-     * Generates a map using an array.
-     *
-     * @return Returns a working map that has something like a pedestal in it,
-     * or something.  There are no MapObject layers and only one tile layer.
+    /**
+     * Scale factor makes a 32x32 tile into 1 world unit
      */
-    private TiledMap generateTiledMapOldFashioned() {
-
-        map = new TiledMap();
-
-        mapLayout = Arrays.asList(
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-        );
-        mapHeight = mapLayout.size() / mapWidth;
-        x = 0;
-        y = 0;
-
-        TiledMapTileLayer layer = new TiledMapTileLayer(mapWidth, mapHeight, 32, 32);
-        for (int i = 0; i < mapLayout.size(); i++) {
-
-            TextureRegion region = null;
-            int value = mapLayout.get(i);
-            int row, column;
-
-            switch(value) {
-                case 0:
-                    // Upper left corner texture is the "emptiest", I guess.
-                    row = column = 0;
-                    break;
-                case 1:
-                    // Wall texture
-                    row = column = 1;
-                    break;
-                case 2:
-                    // Pedestal texture?
-                    row = 2;
-                    column = 0;
-                    break;
-                case 3:
-                    // Thing at the top of the pedestal
-                    row = column = 6;
-                    break;
-                default:
-                    // Something ridiculous, to test for bugs
-                    row = 2;
-                    column = 6;
-                    break;
-            }
-            region = new TextureRegion(tileSet, row * 32, column * 32, 32, 32);
-            Cell cell = new Cell();
-            cell.setTile(new StaticTiledMapTile(region));
-            int x = i % mapWidth;
-            int y = i / mapWidth;
-            layer.setCell(x, mapHeight - y + 1, cell);
-        }
-        layer.setName("layer");
-        map.getLayers().add(layer);
-        return map;
-    }
+    public static final float WORLD_SCALE = 1.0f/32;
 
     TiledMap getTMXMap() {
         TiledMap map = new TmxMapLoader().load("untitled.tmx");
@@ -130,7 +58,7 @@ public class Main extends ApplicationAdapter {
                                          PLAYER_SPRITE_COLUMN * TILE_WIDTH,
                                          PLAYER_SPRITE_ROW * TILE_HEIGHT,
                                          TILE_WIDTH,
-                                         TILE_HEIGHT));
+                                         TILE_HEIGHT), WORLD_SCALE);
 
         map = getTMXMap ();
         renderer = new OrthogonalTiledMapRenderer(map, 1.0f / 32);
