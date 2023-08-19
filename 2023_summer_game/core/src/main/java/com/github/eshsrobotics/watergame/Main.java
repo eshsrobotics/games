@@ -59,6 +59,7 @@ public class Main extends ApplicationAdapter {
                                          PLAYER_SPRITE_ROW * TILE_HEIGHT,
                                          TILE_WIDTH,
                                          TILE_HEIGHT), WORLD_SCALE);
+        p.getSprite().setPosition(15, 15);
 
         map = getTMXMap ();
         renderer = new OrthogonalTiledMapRenderer(map, 1.0f / 32);
@@ -70,18 +71,31 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
+        final float MOVE_SPEED = 0.2f;
+        float playerDestinationX = p.getSprite().getX();
+        float playerDestinationY = p.getSprite().getY();
         if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-            p.getSprite().setX(p.getSprite().getX() - 0.2f);
+            playerDestinationX = p.getSprite().getX() - MOVE_SPEED;
         }
         if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-            p.getSprite().setX(p.getSprite().getX() + 0.2f);
+            playerDestinationX = p.getSprite().getX() + MOVE_SPEED;
         }
         if (Gdx.input.isKeyPressed(Keys.UP)) {
-           p.getSprite().setY(p.getSprite().getY() + 0.2f);
+           playerDestinationY = p.getSprite().getY() + MOVE_SPEED;
         }
         if (Gdx.input.isKeyPressed(Keys.DOWN)) {
-            p.getSprite().setY(p.getSprite().getY() - 0.2f);
+            playerDestinationY = p.getSprite().getY() - MOVE_SPEED;
         }
+
+        String id = p.detectCollision(getTMXMap().getLayers().get("Walls"));            
+        if (id == "") {
+            // Only move the player if their new position would not collide 
+            // with a wall.
+            p.getSprite().setPosition(playerDestinationX, playerDestinationY);
+        } else {
+            // System.out.printf("id='%s'\n", id);
+        }
+
         camera.position.x = p.getSprite().getX();
         camera.position.y = p.getSprite().getY();
         camera.update();

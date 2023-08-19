@@ -11,6 +11,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.utils.Null;
 
 /**
  * This object represents the player (the submarine navigating through the
@@ -28,7 +29,12 @@ public class Player {
      */
     private BoundingBox hitBox;
 
-
+    /**
+     * A factor used to convert from world coordinates to world pixel
+     * coordinates.  An object at (x, y) in world space is located at
+     * (x/scaleFactor, y/scaleFactor) in world pixel space.
+     */
+    private float scaleFactor;
 
     /**
      * Creates a new, valid instance of the Player class.
@@ -36,7 +42,9 @@ public class Player {
      * @param region The region of the texture that represents the player's
      *               sprite (currently not animated.)
      *
-     * @param scaleFactor The scale factor from world units to pixels
+     * @param scaleFactor The scale factor from world units to pixels.  A value
+     *                    of 1.0f/32, for instance, means that each world unit
+     *                    is 32x32 pixels.
      */
     public Player(TextureRegion region, float scaleFactor) {
 
@@ -46,6 +54,7 @@ public class Player {
         // We are setting the sprite's position in world pixel coordinates.
         this.playerSprite = new Sprite(region);
         this.playerSprite.setPosition(0, 0);
+        this.scaleFactor = scaleFactor;
         float playerWidthWorld = playerSprite.getWidth() * scaleFactor;
         float playerHeightWorld = playerSprite.getHeight() * scaleFactor;
         Vector3 min = new Vector3(-playerWidthWorld/2, -playerHeightWorld/2, 0);
@@ -81,32 +90,92 @@ public class Player {
         return this.playerSprite;
     }
 
+    /**
+     * Detects whtether our player sprite has touched any MapObject in the given
+     * MapLayer.
+     * @return The ID of the colliding object, as a string. If the player is
+     *         colliding with more than one such object simultaneously, we will
+     *         return a value according to our collision priority.
+     *
+     *         <p>If we have not collided with anything, we return an empty 
+     *         string.</p>
+     * @apiNote Why are we returning a String here instead of a boolean?  There
+     *          must have been a reason.
+     */
     public String detectCollision(MapLayer objectLayer) {
         for (int i = 0; i < objectLayer.getObjects().getCount(); i++) {
             MapObject mapObject = objectLayer.getObjects().get(i);
             if (mapObject instanceof RectangleMapObject) {
                 // Are we intersecting with this rectangle?
-
+                boolean playerIntersectsWall = intersects((RectangleMapObject)mapObject, hitBox);
+                if (playerIntersectsWall) {
+                    return mapObject.getProperties().get("id").toString();
+                } 
+            } else {
+                // Detecting other MapObjects goes here.
             }
         }
+        return "";
     }
 
-    private boolean intersects(RectangleMapObject rect, BoundingBox box) {
-            boolean intersected = false;
+    /**
+     * Returns true if the given bounding box intersects the given map object
+     * and false otherwise.
+     *
+     * @param rect The map rectangle we are detecting a collision with.  The
+     *             x, y, width, and height values here are all in world PIXEL
+     *             coordinates (and so depend on the tilesize.)
+     * @param box  The player's bounding box.  The values here are specified in
+     *             world coordinates (in other words, in terms of tiles.)
+     */
+    private boolean intersects(RectangleMapObject rect, BoundingBox box) {            
+        float wallX = rect.getRectangle().x;
+        float wallY = rect.getRectangle().y;
+        float wallWidth = rect.getRectangle().width;
+        float wallHeight = rect.getRectangle().height;
 
-            final float width = box.getWidth();
-            final float height = box.getHeight();
-            Vector3 center = new Vector3(); box.getCenter(center);
+        // Convert rect (which is in world pixel coordinates) to world coordinates.
+        wallX *= scaleFactor;
+        wallY *= scaleFactor;
+        wallWidth *= scaleFactor;
+        wallHeight *= scaleFactor;
 
-            // Test to see if any of the corners of the bounding box are
-            // contained within the rect.
-            for (Vector3 corner : new Vector3[] {
-                new Vector3(center.x - width/2, center.y - width/2, 0),
-                new Vector3(center.x + width/2, center.y - width/2, 0),
-                new Vector3(center.x + width/2, center.y + width/2, 0),
-                new Vector3(center.x - width/2, center.y + width/2, 0)
-            }) {
+        // Grab the 3D coordinates of the bounding box representing the player.
+        // Note that the Z coordinates are effectively ignored.
+        Vector3 bottomLeftCorner = new Vector3();
+        box.getMin(bottomLeftCorner);
+        Vector3 upperRightCorner = new Vector3();
+        box.getMax(upperRightCorner);           
 
-            }
+        float playerX = bottomLeftCorner.x;
+        float playerY = bottomLeftCorner.y;
+        float playerWidth = box.getWidth();
+        float playerHeight = box.getHeight();
+
+        if (rect.getProperties().get("id").toString() == "5") {
+            System.out.printf("wall: (x=%.1f, y=%.1f, width=%.1f, height=%.1f), player: (x=%.1f, y=%.1f, width=%.1f, height=%.1f)\n",
+                wallX, wallY, wallWidth, wallHeight,
+                playerX, playerY, playerWidth, playerHeight);
+        }
+        
+
+        if (playerX + playerWidth < wallX) {
+            return false;
+        }
+        
+        if (playerY + playerHeight < wallY) {
+            return false;
+        }
+
+        if (playerX > wallX + wallWidth) {
+            // Beyond right side.
+            return false;
+        }
+
+        if (playerY > wallY + wallHeight) {
+            // Beyond top side
+            return false;
+        }
+        return true;
     }
 }
