@@ -8,14 +8,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.Input.Keys;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -71,7 +66,8 @@ public class Main extends ApplicationAdapter {
                                          PLAYER_SPRITE_COLUMN * TILE_WIDTH,
                                          PLAYER_SPRITE_ROW * TILE_HEIGHT,
                                          TILE_WIDTH,
-                                         TILE_HEIGHT));
+                                         TILE_HEIGHT), WORLD_SCALE);
+        p.getSprite().setPosition(15, 15);
 
         map = getTMXMap();
         renderer = new OrthogonalTiledMapRenderer(map, unitScale);
@@ -89,21 +85,33 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
+        final float MOVE_SPEED = 0.2f;
+        float playerDestinationX = p.getSprite().getX();
+        float playerDestinationY = p.getSprite().getY();
         if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-            p.getSprite().setX(p.getSprite().getX() - 0.2f);
+            playerDestinationX = p.getSprite().getX() - MOVE_SPEED;
         }
         if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-            p.getSprite().setX(p.getSprite().getX() + 0.2f);
+            playerDestinationX = p.getSprite().getX() + MOVE_SPEED;
         }
         if (Gdx.input.isKeyPressed(Keys.UP)) {
-            p.getSprite().setY(p.getSprite().getY() + 0.2f);
+           playerDestinationY = p.getSprite().getY() + MOVE_SPEED;
         }
         if (Gdx.input.isKeyPressed(Keys.DOWN)) {
-            p.getSprite().setY(p.getSprite().getY() - 0.2f);
+            playerDestinationY = p.getSprite().getY() - MOVE_SPEED;
         }
+
+        String id = p.detectCollision(getTMXMap().getLayers().get("Walls"));
+        if (id == "") {
+            // Only move the player if their new position would not collide
+            // with a wall.
+            p.getSprite().setPosition(playerDestinationX, playerDestinationY);
+        } else {
+            // System.out.printf("id='%s'\n", id);
+        }
+
         camera.position.x = p.getSprite().getX();
         camera.position.y = p.getSprite().getY();
-
         camera.update();
         renderer.setView(camera);
 
