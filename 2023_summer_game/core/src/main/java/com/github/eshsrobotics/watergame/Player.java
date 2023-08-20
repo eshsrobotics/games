@@ -25,11 +25,6 @@ public class Player {
     private Sprite playerSprite;
 
     /**
-     * Hitbox is axis aligned, which means it is not easy to rotate
-     */
-    private BoundingBox hitBox;
-
-    /**
      * A factor used to convert from world coordinates to world pixel
      * coordinates.  An object at (x, y) in world space is located at
      * (x/scaleFactor, y/scaleFactor) in world pixel space.
@@ -55,11 +50,24 @@ public class Player {
         this.playerSprite = new Sprite(region);
         this.playerSprite.setPosition(0, 0);
         this.scaleFactor = scaleFactor;
-        float playerWidthWorld = playerSprite.getWidth() * scaleFactor;
-        float playerHeightWorld = playerSprite.getHeight() * scaleFactor;
-        Vector3 min = new Vector3(-playerWidthWorld/2, -playerHeightWorld/2, 0);
-        Vector3 max = new Vector3(playerWidthWorld/2, playerHeightWorld/2, 0);
-        hitBox = new BoundingBox(min, max);
+    }
+
+    /**
+     * Returns a {@link BoundingBox} centered on the player's sprite.  The
+     * bounding box will be axis-aligned, which means that it will take up too
+     * much space when the player sprite rotates.
+     *
+     * <p>The box will always be 0 units deep in the Z direction.  All
+     * bounding box coordinates and dimensions are in world units.</p>
+     */
+    private BoundingBox getHitBox() {
+        float width = playerSprite.getWidth() * scaleFactor;
+        float height = playerSprite.getHeight() * scaleFactor;
+        float x = playerSprite.getX();
+        float y = playerSprite.getY();
+        Vector3 min = new Vector3(x - width/2, y - height/2, 0);
+        Vector3 max = new Vector3(x + width/2, y + height/2, 0);
+        return new BoundingBox(min, max);
     }
 
     /**
@@ -91,7 +99,7 @@ public class Player {
     }
 
     /**
-     * Detects whtether our player sprite has touched any MapObject in the given
+     * Detects whether our player sprite has touched any MapObject in the given
      * MapLayer.
      * @return The ID of the colliding object, as a string. If the player is
      *         colliding with more than one such object simultaneously, we will
@@ -103,6 +111,7 @@ public class Player {
      *          must have been a reason.
      */
     public String detectCollision(MapLayer objectLayer) {
+        var hitBox = getHitBox();
         for (int i = 0; i < objectLayer.getObjects().getCount(); i++) {
             MapObject mapObject = objectLayer.getObjects().get(i);
             if (mapObject instanceof RectangleMapObject) {
@@ -152,18 +161,13 @@ public class Player {
         float playerWidth = box.getWidth();
         float playerHeight = box.getHeight();
 
-        if (rect.getProperties().get("id").toString() == "5") {
-            System.out.printf("wall: (x=%.1f, y=%.1f, width=%.1f, height=%.1f), player: (x=%.1f, y=%.1f, width=%.1f, height=%.1f)\n",
-                wallX, wallY, wallWidth, wallHeight,
-                playerX, playerY, playerWidth, playerHeight);
-        }
-
-
         if (playerX + playerWidth < wallX) {
+            // Beyond left side.
             return false;
         }
 
         if (playerY + playerHeight < wallY) {
+            // Beyond bottom side.
             return false;
         }
 
@@ -173,9 +177,14 @@ public class Player {
         }
 
         if (playerY > wallY + wallHeight) {
-            // Beyond top side
+            // Beyond top side.
             return false;
         }
+
+        // System.out.printf("wall [id=%s]: (x=%.1f, y=%.1f, width=%.1f, height=%.1f), player: (x=%.1f, y=%.1f, width=%.1f, height=%.1f)\n",
+        //                   rect.getProperties().get("id"),
+        //                   wallX, wallY, wallWidth, wallHeight,
+        //                   playerX, playerY, playerWidth, playerHeight);
         return true;
     }
 }

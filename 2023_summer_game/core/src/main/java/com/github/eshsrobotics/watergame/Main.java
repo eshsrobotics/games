@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.Input.Keys;
 import java.util.List;
 
@@ -58,15 +60,15 @@ public class Main extends ApplicationAdapter {
         tileSet = new Texture("fantasy-tileset.png");
 
         // Skull sprite: column 2, row 10.
-        final int PLAYER_SPRITE_COLUMN = 2;
-        final int PLAYER_SPRITE_ROW = 10;
+        final int PLAYER_SPRITE_COLUMN = 5;
+        final int PLAYER_SPRITE_ROW = 18;
         final int TILE_WIDTH = 32;
         final int TILE_HEIGHT = 32;
         p = new Player(new TextureRegion(tileSet,
                                          PLAYER_SPRITE_COLUMN * TILE_WIDTH,
                                          PLAYER_SPRITE_ROW * TILE_HEIGHT,
                                          TILE_WIDTH,
-                                         TILE_HEIGHT), WORLD_SCALE);
+                                         TILE_HEIGHT), unitScale);
         p.getSprite().setPosition(15, 15);
 
         map = getTMXMap();
@@ -85,29 +87,28 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
-        final float MOVE_SPEED = 0.2f;
-        float playerDestinationX = p.getSprite().getX();
-        float playerDestinationY = p.getSprite().getY();
+        final float MOVE_SPEED = 0.05f;
+        Vector2 position = new Vector2(p.getSprite().getX(), p.getSprite().getY());
+        Vector2 velocity = new Vector2(0, 0);
         if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-            playerDestinationX = p.getSprite().getX() - MOVE_SPEED;
+            velocity.x -= MOVE_SPEED;
         }
         if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-            playerDestinationX = p.getSprite().getX() + MOVE_SPEED;
+            velocity.x += MOVE_SPEED;
         }
         if (Gdx.input.isKeyPressed(Keys.UP)) {
-           playerDestinationY = p.getSprite().getY() + MOVE_SPEED;
+           velocity.y += MOVE_SPEED;
         }
         if (Gdx.input.isKeyPressed(Keys.DOWN)) {
-            playerDestinationY = p.getSprite().getY() - MOVE_SPEED;
+            velocity.y -= MOVE_SPEED;
         }
 
+        // Try to move, but undo the move if we hit an obstacle.
+        p.getSprite().setPosition(position.x + velocity.x, position.y + velocity.y);
         String id = p.detectCollision(getTMXMap().getLayers().get("Walls"));
-        if (id == "") {
-            // Only move the player if their new position would not collide
-            // with a wall.
-            p.getSprite().setPosition(playerDestinationX, playerDestinationY);
-        } else {
-            // System.out.printf("id='%s'\n", id);
+        if (id != "") {
+            System.out.printf("Bumped into wall: id='%s'\n", id);
+            p.getSprite().setPosition(position.x, position.y);
         }
 
         camera.position.x = p.getSprite().getX();
