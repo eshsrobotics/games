@@ -30,5 +30,9 @@ public class Main {
                 System.out.println("            |       |      ");
             } else System.out.println("Space has been used, try again");
         }
+        if (box[0][0] && box [0][1] && box[0][2] .equals("x")||("o"))
+            System.out.println("Player "+playerTurn+" Wins!");
     }
 }
+
+
