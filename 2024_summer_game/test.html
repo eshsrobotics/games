@@ -22,6 +22,69 @@
                 text-shadow: 0px 0px 1000px black;
             }
         </style>
+        <script>
+            function fibonacci(n) {
+                if (n <= 0) {
+                    return 0;
+                } else if (n === 1) {
+                    return 1;
+                } else if (n === 2) {
+                    return 1;
+                } else {
+                    return fibonacci(n - 1) + fibonacci(n - 2);
+                }
+            }
+            function itrfib(n) {
+                let f1 = 0;
+                let f2 = 0;
+                switch (n) {
+                    case null:
+                        console.error("iterfib must take a nautral argument");
+                        break;
+                    case 0:
+                        return 1;
+                    case 1:
+                    case 2:
+                        return 1
+                    default:
+                        f1 = 1;
+                        f2 = 1;
+                        console.debug("temp\tf1\tf2")
+                        for (let i = 3; i <= n; i++) {
+                            if (i === n) {
+                                break;
+                            }
+                            let temp = f2;
+                            f2 = f2 + f1;
+                            f1 = temp;
+                            console.debug("%o\t%o\t%o\t", temp, f1, f2);
+                        }
+                        break;
+                }
+                return f1 + f2;
+            }
+
+            function Animal(name, color, mass) {
+                "use strict";
+
+                this.greet = () => {
+                    return `This animal's name is "${name}"`;
+                };
+
+                if (typeof(color) !== "string" || color.length === 0) {
+                    color = "green";
+                }
+                if (typeof(mass) !== "number") {
+                    throw new Error("Make sure mass is a number.");
+                }
+
+                this.name = name;
+                this.color = color;
+                this.mass = mass;
+                return this;
+            }
+
+        </script>
     </head>
 
     <body>
@@ -36,8 +99,8 @@
         </div>
 
         <div id="xp">
-            <ul> 
-                <li>mice1</li> 
+            <ul>
+                <li>mice1</li>
                 <li>mice2</li>
                 <li>mice3</li>
                 <li>mice4</li>
