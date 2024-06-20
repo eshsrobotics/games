@@ -83,6 +83,21 @@
                 this.mass = mass;
                 return this;
             }
+            // This is a call-back to window.requestAnimationFrame()
+            function animateFlexBox(timestampMs) {
+                const fps = 5.0;
+                const millisecondsPerFrame = 1/fps * 1000;
+
+                // Test to see whether we need to animate this frame.
+                if (window.previousTimeStampMs && timestampMs - window.previousTimeStampMs > millisecondsPerFrame) {
+                    flex-basis = timestampMs + 1
+                }
+                // We need to retain the previous timestamp to know the amount
+                // of time that has passed between the last frame and current
+                // frame; knowing that will tell us whether we need to animate
+                // the current frame.
+                window.previousTimeStampMs = timestampMs;
+            }
 
         </script>
     </head>
