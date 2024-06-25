@@ -1,113 +1,135 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <link href= "test.css" rel="stylesheet"/>
-        <style type="text/css">
-            span {
-                font-size: x-large;
-                color: blue;
-            }
 
-            #third {
-                border: 10px inset orange;
-                width: 50%;
-                margin-left: auto;
-                margin-right: auto;
-            }
+<head>
+    <link href="test.css" rel="stylesheet" />
+    <style type="text/css">
+        span {
+            font-size: x-large;
+            color: blue;
+        }
 
-            .whatever {
-                padding: 50px;
-                background: linear-gradient(to bottom, red,green,blue);
-                color: yellow;
-                text-shadow: 0px 0px 1000px black;
-            }
-        </style>
-        <script>
-            class Animal {
-                name = "George";
-                color = "green";
-                mass = 50;
+        #third {
+            border: 10px inset orange;
+            width: 50%;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-                constructor(name, color, mass) {
-                    if (typeof(name) === "string" && name.length > 0){
-                        this.name = name;
-                    }
-                    if (typeof(color) === "string" && color.length > 0){
-                        this.color = color;
-                    }
-                    if (typeof(mass) !== "number") {
-                        throw new Error("Make sure mass is a number.");
-                    } else {
-                        this.mass = mass;
-                    }
+        .whatever {
+            padding: 50px;
+            background: linear-gradient(to bottom, red, green, blue);
+            color: yellow;
+            text-shadow: 0px 0px 1000px black;
+        }
+    </style>
+    <script>
+        class Animal {
+            name = "George";
+            color = "green";
+            mass = 50;
+
+            constructor(name, color, mass) {
+                if (typeof (name) === "string" && name.length > 0) {
+                    this.name = name;
                 }
-
-                greet() {
-                    return `This animal's name is "${this.name}"`;
+                if (typeof (color) === "string" && color.length > 0) {
+                    this.color = color;
                 }
-            }
-
-            function OldAnimal(name, color, mass) {
-                "use strict";
-
-                this.greet = () => {
-                    return `This animal's name is "${name}"`;
-                };
-
-                if (typeof(color) !== "string" || color.length === 0) {
-                    color = "green";
-                }
-                if (typeof(mass) !== "number") {
+                if (typeof (mass) !== "number") {
                     throw new Error("Make sure mass is a number.");
+                } else {
+                    this.mass = mass;
                 }
-
-                this.name = name;
-                this.color = color;
-                this.mass = mass;
-                return this;
             }
-            // This is a call-back to window.requestAnimationFrame()
-            function animateFlexBox(timestampMs) {
-                const fps = 5.0;
-                const millisecondsPerFrame = 1/fps * 1000;
 
-                // Test to see whether we need to animate this frame.
-                if (window.previousTimeStampMs && timestampMs - window.previousTimeStampMs > millisecondsPerFrame) {
-                    // flex-basis = timestampMs + 1
+            greet() {
+                return `This animal's name is "${this.name}"`;
+            }
+        }
+
+        // This is a call-back to window.requestAnimationFrame()
+        function animateFlexBox(timestampMs) {
+            const fps = 20.0;
+            const millisecondsPerFrame = 1 / fps * 1000;
+
+            // Test to see whether we need to animate this frame.
+            if (window.previousTimeStampMs && timestampMs - window.previousTimeStampMs > millisecondsPerFrame) {
+                console.debug("%o", timestampMs);
+                // If control makes it here, enough time has passed for this current frame to be animated.
+
+                // All values entering the function timeStamp %19 (the 19 is the
+                // total number of frames of the entire sequence of 1., 2, 3...
+                // 8, 9, 10, 9, 8...3, 2, 1) will produce a value 0 and 19
+                // exclusive. If the timestampMs < 10, the x-value = timestampMs%
+                // 19; however, this does not work for values >=10, so in that
+                // case, we need a different formula which converts the
+                // increasing values from 10 to 19 exclusive to 9 to 0
+                // exclusive.
+                let x = 0;
+                if (timestampMs % 19 < 10) {
+                    x = timestampMs % 19; // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+                } else { // 10, 11, 12, 13, 14, 15, 16, 17, 18
+
+                    // How did we figure out what value to subtract timestampMs
+                    // mod 19 from?  By plugging in numbers: in the expression
+                    // "y - timestampMs % 19", the value becomes:
+                    //
+                    //   * 9 when timestampMs is 10, and
+                    //   * 0 when timestampMs is 19
+                    //
+                    // if and only if y is 19.
+                    x = 19 - timestampMs % 19; // 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
                 }
-                // We need to retain the previous timestamp to know the amount
+                let flexBasis = x + 1;
+                console.debug("%o: %o", timestampMs, flexBasis);
+
+                document.querySelectorAll("#xp ul li").forEach(element => {
+                    element.style.flexBasis = flexBasis + "em";
+                });
+                // We need to retain the previous timestampMs to know the amount
                 // of time that has passed between the last frame and current
                 // frame; knowing that will tell us whether we need to animate
                 // the current frame.
                 window.previousTimeStampMs = timestampMs;
             }
 
-        </script>
-    </head>
+            if (window.previousTimeStampMs === undefined) {
+                window.previousTimeStampMs = timestampMs;
+            }
+            window.requestAnimationFrame(animateFlexBox);
+        }
+        let id = window.requestAnimationFrame(animateFlexBox);
+        console.debug("%o", id);
 
-    <body>
-        <h1 class="whatever">page title</h1>
-        <p class = "whatever"> Hello world! </p>
-        Goodbye <span> world! </span>
-        <br/> Hello world!
-        <br/> Goodbye world!
-        <p id="third"> Hello world! </p>
-        <div>
-            Goodbye world!
-        </div>
 
-        <div id="xp">
-            <ul>
-                <li>mice1</li>
-                <li>mice2</li>
-                <li>mice3</li>
-                <li>mice4</li>
-                <li>mice5</li>
-                <li>mice6</li>
-                <li>mice7</li>
-                <li>mice8</li>
-                <li>mice9</li>
-            </ul>
-        </div>
-    </body>
+    </script>
+</head>
+
+<body>
+    <h1 class="whatever">page title</h1>
+    <p class="whatever"> Hello world! </p>
+    Goodbye <span> world! </span>
+    <br /> Hello world!
+    <br /> Goodbye world!
+    <p id="third"> Hello world! </p>
+    <div>
+        Goodbye world!
+    </div>
+
+    <div id="xp">
+        <ul>
+            <li>mice1</li>
+            <li>mice2</li>
+            <li>mice3</li>
+            <li>mice4</li>
+            <li>mice5</li>
+            <li>mice6</li>
+            <li>mice7</li>
+            <li>mice8</li>
+            <li>mice9</li>
+        </ul>
+    </div>
+</body>
+
 </html>
