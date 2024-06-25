@@ -9,7 +9,7 @@
     flex-wrap: wrap; /*makes sure the elements don't go past the edge of the screen, creates the rows*/
     justify-content: space-between;
     border: 1px solid red;
-    
+
 }
 
 #xp li {
@@ -19,7 +19,7 @@
     border: 1px solid gray;
     /*flex-basis: 33%; controls the width of the row elements, number represents % of the width of main axis of the parent element ul
     flex-shrink: 0; can reduce the width of an element from what flex-basis sets*/
-    flex: 0 1 10m;
+    flex: 0 1 10em;
     box-shadow: 5px 5px 0px 0px black;
     text-align: center;
 }
