@@ -63,8 +63,32 @@
                 }
                 return f1 + f2;
             }
+            
+            class Animal {
+                name = "George";
+                color = "green";
+                mass = 50;
 
-            function Animal(name, color, mass) {
+                constructor(name, color, mass) {
+                    if (typeof(name) === "string" && name.length > 0){
+                        this.name = name;
+                    }
+                    if (typeof(color) === "string" && color.length > 0){
+                        this.color = color;
+                    }
+                    if (typeof(mass) !== "number") {
+                        throw new Error("Make sure mass is a number.");
+                    } else {
+                        this.mass = mass;
+                    }
+                }
+
+                greet() {
+                    return `This animal's name is "${this.name}"`;
+                }
+            }
+            
+            function OldAnimal(name, color, mass) {
                 "use strict";
 
                 this.greet = () => {
