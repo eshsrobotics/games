@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Drag and Drop Experiment
+        </title>
+
+        <style type="text/css">
+            #playground {
+                width: 500px;
+                height: 500px;
+                border: 1px solid red;
+                position: absolute;
+            }
+
+            #a {
+                width: 200px;
+                height: 200px;
+                border: 1px solid gold;
+                background-color: green;
+                position:absolute;
+                left: 0px;
+                top: 0px;
+            }
+
+            #b {
+                width: 200px;
+                height: 200px;
+                border: 1px solid midnightblue;
+                background-color: rebeccapurple;
+                position:absolute;
+                right: 0px;
+                bottom: 0px;
+            }
+        </style>
+
+    </head>
+    <body>
+        <div id="playground">
+            <div id="a">
+            </div>
+            <div id="b"></div>
+        </div>
+        <script>
+
+            // A hashtable was created to store the color values for each of our
+            // <div> ids.
+            let original_color = {a: "", b: ""};
+
+            // the querySelectorAll function selects all of the div direct
+            // children of the #playground div. Then, we iterate over the direct
+            // children, adding a EventListeners for mousenter and mouseleave.
+            // Evenlistners stay on watch for an event to occur so that they can
+            // do something in response to that event.
+            document.querySelectorAll("#playground > div").forEach(current_element => {
+                current_element.addEventListener("mouseenter", evt => {
+
+                    // This variable stores the original color of our div
+                    // elements. We store the computed style, which is the final
+                    // style that the browser renders.
+                    let computed_style = getComputedStyle(evt.target);
+                    let id = evt.target.id;
+
+                    // Have we stored a color at this id yet?
+                    if (original_color[id] === "") {
+
+                        // No, we have not.
+                        original_color[id] = computed_style.backgroundColor;
+                        console.info("original_color['%o'] = %o", id, original_color[id]);
+                    }
+                    evt.target.style.backgroundColor = "rgb(0, 0, 185)";
+                });
+
+                // We want to restore the original color back to the element
+                // once the mouse is no longer on it.
+                current_element.addEventListener("mouseleave", evt => {
+                    let id = evt.target.id;
+                    evt.target.style.backgroundColor = original_color[id];
+                })
+            });
+        </script>
+    </body>
+</html>
